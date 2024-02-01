@@ -1,15 +1,30 @@
-name: Node.js CI
+name: Deploy to GitHub Pages
 
-on: [push]  # Trigger the workflow on push events
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3  # Check out the repository code
-      - uses: actions/setup-node@v3  # Set up Node.js
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
         with:
-          node-version: 16  # Specify the Node.js version (adjust as needed)
-      - run: npm install  # Install dependencies
-      - run: node app.js  # Run your Node.js application 
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build app (if necessary)
+        run: npm run build  # Adjust if you have a different build command
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public  # Adjust if your output directory is different
